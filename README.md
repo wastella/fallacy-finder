@@ -1,6 +1,8 @@
 # Fallacy Finder
 Fallacy Finder is a Google Chrome Extension that allows you to check text of your choice for fallacies and manipulation techniques using [Google Gemini AI](https://gemini.google.com/app).
 
+![Fallacy Finder Screenshot](https://github.com/wastella/fallacy-finder/blob/main/screenshot.png?raw=true)
+
 ## Installation
 Until I put this on the Google Chrome Store, you can load it in locally quite easily.
 
