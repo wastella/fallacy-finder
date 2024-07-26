@@ -14,7 +14,7 @@ You can use this command:
 
 4. Click the **Load Unpacked** button on the top left of the screen
 
-5. Choose the **src** directory on your cloned version of this repository
+5. Choose the **fallacy-finder** directory on your cloned version of this repository
 
 After these steps, it should be in your extensions bar.
 
