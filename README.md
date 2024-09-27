@@ -30,7 +30,14 @@ Just go to the [Google AI Studio](https://aistudio.google.com/) and create an AP
 Then enter this API key into the menu when you click on the extension's icon, and you should get an alert saying that you have successfuly registered the API key.
 
 ### How To Actually Use It
-When you find a bit of text you want to check, just highlight it, and then right click. After that you should see an option on the menu called **Fallacy Finder**. If you click on it, and go to the popup for the extension (click on the extension's icon), it should should the text you highlighted. After that, just click the **Send to AI** button, and after a few seconds you should have your response.
+Fallacy Finder has two modes, **Highlighted Text** and **Page HTML**. In the first mode, you highlight a bit of text and right click. After that you should see an option on the menu called Fallacy Finder. If you click on it the text should appear in the popup. After that, just click the **Analyze** button, and after a few seconds then it will give you a score based on how fallacious, misleading, manipulative, or otherwise misinformative it is. 
 
+In the second mode, you toggle the switch to **Analyze From Page HTML** Then click the **Analyze** button. This should send the entire HTML of the page that you are currently on to the AI. It will then analyze the text of the page (usually an article or some type of post) and then it will give you a score based on how fallacious, misleading, manipulative, or otherwise misinformative it is.
 If you have a new bit of text, just rinse and repeat.
+
+### Score Classifications
+- If the score is **RED** (100-75), then the text is very fallacious and manipulative.
+- If the score is **ORANGE** (74-50), then the text is somewhat fallacious and manipulative.
+- If the score is **GREEN** (49-0), then the text is not fallacious and not manipulative whatsoever.
+
 
