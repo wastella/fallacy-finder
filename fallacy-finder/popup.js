@@ -4,13 +4,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const apiKeyInput = document.getElementById('api_key');
   const saveApiKeyButton = document.getElementById('save_api_key');
   const contentElement = document.getElementById('content');
-  const btnGemini = document.getElementById('btn_gemini');
+  const btnAnalyze = document.getElementById('btn_analyze');
   const resultText = document.getElementById('result_text');
+  const toggleInput = document.getElementById('toggle_input');
+  const toggleLabel = document.getElementById('toggle_label');
+  const contentWrapper = document.getElementById('content_wrapper');
 
   // Load stored API key and highlighted text
   chrome.storage.local.get(['apiKey', 'highlightedText'], (result) => {
     apiKeyInput.value = result.apiKey || '';
-    contentElement.innerText = result.highlightedText || 'No text highlighted';
+    updateContent();
   });
 
   // Save API key
@@ -21,19 +24,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Send highlighted text to Gemini API
-  btnGemini.addEventListener('click', () => {
-    btnGemini.disabled = true;
-    resultText.innerText = 'Processing...';
+  // Analyze button click event
+  btnAnalyze.addEventListener('click', () => {
+    sendToGemini(toggleInput.checked ? 'pageContent' : 'highlightedText');
+  });
 
-    chrome.storage.local.get(['apiKey', 'highlightedText'], (result) => {
+  // Toggle input change event
+  toggleInput.addEventListener('change', () => {
+    toggleLabel.textContent = toggleInput.checked ? 'Analyze From Page HTML' : 'Analyze From Highlighted Text';
+    updateContent();
+  });
+
+  function updateContent() {
+    if (toggleInput.checked) {
+      contentWrapper.style.display = 'none';
+      chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+        chrome.runtime.sendMessage({action: "getPageContent", tabId: tabs[0].id}, (response) => {
+          if (response && response.pageContent) {
+            chrome.storage.local.set({ pageContent: response.pageContent });
+          } else {
+            console.error('Error: ' + (response ? response.error : 'Could not retrieve page content'));
+          }
+        });
+      });
+    } else {
+      contentWrapper.style.display = 'block';
+      chrome.storage.local.get(['highlightedText'], (result) => {
+        contentElement.innerText = result.highlightedText || 'No Hext Highlighted';
+      });
+    }
+  }
+
+  function sendToGemini(contentType) {
+    btnAnalyze.disabled = true;
+    resultText.innerText = 'Analyzing...';
+
+    chrome.storage.local.get(['apiKey', contentType], (result) => {
       const apiKey = result.apiKey;
-      const prompt = "You are an expert in logical fallacies and manipulation techniques. I am going to give you a piece of text, and I want you to tell me about every logical fallacy in it using this specific format: 1. (first fallacy) (explaination of why the text exhibits this fallacy) 2. (second fallacy) (explanation of why the text exhibits this second fallacy). Continue for as many fallacies as you find. The text is: "
-      const highlightedText = (prompt + result.highlightedText) || '';
+      const prompt = "You are an expert in logical fallacies and manipulation techniques. I am going to give you a piece of text, and I want you to give me a score one through 100 on how fallacious, misleading, manipulative, or otherwise misinformative the text is. Only output the score in this format: X/100. To be clear, if you output a score below 50, there is little to no problematic text, if you output from 50-75 then there is some problematic text, and if you output above 75 then there is very high likelihood that the text is intentionally trying to mislead or manipulate the reader.";
+      const content = prompt + (result[contentType] || '');
 
       if (!apiKey) {
         alert('Please set your API key first.');
-        btnGemini.disabled = false;
+        btnAnalyze.disabled = false;
         return;
       }
 
@@ -45,20 +78,36 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: highlightedText
+              text: content
             }]
           }]
         })
       })
       .then((response) => response.json())
       .then((result) => {
-        btnGemini.disabled = false;
-        resultText.innerText = result.candidates && result.candidates[0].content.parts[0].text || 'No response from AI';
+        btnAnalyze.disabled = false;
+        const scoreText = result.candidates && result.candidates[0].content.parts[0].text.trim() || 'N/A';
+        const scoreNumber = parseInt(scoreText.split('/')[0]);
+        resultText.innerText = scoreText;
+        
+        if (!isNaN(scoreNumber)) {
+          if (scoreNumber >= 75) {
+            resultText.style.color = 'red';
+          } else if (scoreNumber >= 50) {
+            resultText.style.color = 'orange';
+          } else {
+            resultText.style.color = 'green';
+          }
+        } else {
+          resultText.style.color = 'black'; // Default color if score is not a number
+        }
+        resultText.style.fontSize = '36px';
       })
       .catch((error) => {
-        btnGemini.disabled = false;
+        btnAnalyze.disabled = false;
         resultText.innerText = 'Error: ' + error.message;
+        resultText.style.fontSize = '16px';
       });
     });
-  });
+  }
 });

@@ -1,34 +1,126 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
+    padding: 20px;
+    width: 350px;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+h1, h2 {
+    margin: 0;
+    color: #3498db;
+}
+
+.api-key-section {
+    display: flex;
+    gap: 10px;
+}
+
+input[type="text"] {
+    flex-grow: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    background-color: #34495e;
+    color: #ecf0f1;
+}
+
+button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    background-color: #3498db;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+.toggle-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #34495e;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #ecf0f1;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #3498db;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+#content_wrapper, #result_wrapper {
+    background-color: #34495e;
     padding: 10px;
-    width: 300px;
-    height: auto;
-  }
-  
-  div {
-    margin-bottom: 10px;
-  }
-  
-  #content {
+    border-radius: 4px;
+}
+
+#content, #result_text {
     white-space: pre-wrap;
     word-wrap: break-word;
-    margin-bottom: 10px;
-  }
-  
-  #result_text {
-    margin-top: 10px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-  
-  button {
-    display: block;
-    margin-top: 10px;
-  }
-  
-  #api_key {
-    width: calc(100% - 22px);
-    margin-bottom: 10px;
-  }
-  
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+#result_text {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    color: #e74c3c;
+}
+
+#content_wrapper { transition: display 0.3s ease-in-out; }

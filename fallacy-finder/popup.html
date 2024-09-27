@@ -2,20 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Highlighted Text</title>
+  <title>Fallacy Finder</title>
   <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-  <div>
-    <label for="api_key">API Key:</label>
-    <input id="api_key" type="text">
-    <button id="save_api_key">Save API Key</button>
+  <div class="container">
+    <h1>Fallacy Finder</h1>
+    <div class="api-key-section">
+      <input id="api_key" type="text" placeholder="Enter your API Key">
+      <button id="save_api_key">Save API Key</button>
+    </div>
+    <div class="toggle-section">
+      <label class="switch">
+        <input type="checkbox" id="toggle_input">
+        <span class="slider round"></span>
+      </label>
+      <span id="toggle_label">Use Highlighted Text</span>
+    </div>
+    <div id="content_wrapper">
+      <h2>Text to Analyze</h2>
+      <div id="content"></div>
+    </div>
+    <button id="btn_analyze">Analyze</button>
+    <div id="result_wrapper">
+      <h2>Analysis Result</h2>
+      <div id="result_text"></div>
+    </div>
   </div>
-  <hr>
-  <p><b>Your Highlighted Text </b></p>
-  <div id="content"></div>
-  <button id="btn_gemini">Send to AI</button>
-  <div id="result_text"></div>
   <script src="popup.js"></script>
 </body>
 </html>

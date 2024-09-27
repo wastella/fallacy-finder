@@ -5,7 +5,11 @@
     "permissions": [
       "contextMenus",
       "activeTab",
-      "storage"
+      "storage",
+      "scripting"
+    ],
+    "host_permissions": [
+      "<all_urls>"
     ],
     "background": {
       "service_worker": "background.js"
@@ -24,4 +28,3 @@
       "128": "icon.png"
     }
   }
-  
