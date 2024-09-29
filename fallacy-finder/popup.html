@@ -3,30 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <title>Fallacy Finder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
   <div class="container">
-    <h1>Fallacy Finder</h1>
-    <div class="api-key-section">
-      <input id="api_key" type="text" placeholder="Enter your API Key">
-      <button id="save_api_key">Save API Key</button>
+    <div class="header">
+      <h1>Fallacy Finder</h1>
+      <button id="settings-button" class="icon-button">
+        <i class="fas fa-cog"></i>
+      </button>
     </div>
-    <div class="toggle-section">
-      <label class="switch">
-        <input type="checkbox" id="toggle_input">
-        <span class="slider round"></span>
-      </label>
-      <span id="toggle_label">Use Highlighted Text</span>
+    <div id="main-content" class="content active">
+      <div class="toggle-section">
+        <label class="switch">
+          <input type="checkbox" id="toggle_input">
+          <span class="slider"></span>
+        </label>
+        <span id="toggle_label">Analyze From Highlighted Text</span>
+      </div>
+      <div id="content_wrapper">
+        <h2>Text to Analyze</h2>
+        <div id="content"></div>
+      </div>
+      <button id="btn_analyze">Analyze Text</button>
+      <div id="result_wrapper">
+        <h2>Fallacy Score</h2>
+        <div id="result_text"></div>
+        <div class="score-indicator">
+          <div class="score-bar"></div>
+        </div>
+      </div>
     </div>
-    <div id="content_wrapper">
-      <h2>Text to Analyze</h2>
-      <div id="content"></div>
-    </div>
-    <button id="btn_analyze">Analyze</button>
-    <div id="result_wrapper">
-      <h2>Analysis Result</h2>
-      <div id="result_text"></div>
+    <div id="settings-content" class="content">
+      <h1>Settings</h1>
+      <br>
+      <h2>Gemini API Key</h2>
+      <div class="api-key-section">
+        <input id="api_key" type="text" placeholder="Enter your API Key">
+        <button id="save_api_key">Save</button>
+      </div>
     </div>
   </div>
   <script src="popup.js"></script>

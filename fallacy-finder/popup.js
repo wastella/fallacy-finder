@@ -9,55 +9,68 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggleInput = document.getElementById('toggle_input');
   const toggleLabel = document.getElementById('toggle_label');
   const contentWrapper = document.getElementById('content_wrapper');
+  const settingsButton = document.getElementById('settings-button');
+  const mainContent = document.getElementById('main-content');
+  const settingsContent = document.getElementById('settings-content');
 
-  // Load stored API key and highlighted text
-  chrome.storage.local.get(['apiKey', 'highlightedText'], (result) => {
+  settingsButton.addEventListener('click', toggleSettings);
+  chrome.storage.local.get(['apiKey', 'highlightedText'], initializeContent);
+  saveApiKeyButton.addEventListener('click', saveApiKey);
+  btnAnalyze.addEventListener('click', () => analyzeContent(toggleInput.checked ? 'pageContent' : 'highlightedText'));
+  toggleInput.addEventListener('change', handleToggleChange);
+
+  function toggleSettings() {
+    mainContent.classList.toggle('active');
+    settingsContent.classList.toggle('active');
+  }
+
+  function initializeContent(result) {
     apiKeyInput.value = result.apiKey || '';
     updateContent();
-  });
+  }
 
-  // Save API key
-  saveApiKeyButton.addEventListener('click', () => {
+  function saveApiKey() {
     const apiKey = apiKeyInput.value.trim();
     chrome.storage.local.set({ apiKey }, () => {
       alert('API key saved!');
+      toggleSettings();
     });
-  });
+  }
 
-  // Analyze button click event
-  btnAnalyze.addEventListener('click', () => {
-    sendToGemini(toggleInput.checked ? 'pageContent' : 'highlightedText');
-  });
-
-  // Toggle input change event
-  toggleInput.addEventListener('change', () => {
+  function handleToggleChange() {
     toggleLabel.textContent = toggleInput.checked ? 'Analyze From Page HTML' : 'Analyze From Highlighted Text';
     updateContent();
-  });
+  }
 
   function updateContent() {
     if (toggleInput.checked) {
-      contentWrapper.style.display = 'none';
-      chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        chrome.runtime.sendMessage({action: "getPageContent", tabId: tabs[0].id}, (response) => {
-          if (response && response.pageContent) {
-            chrome.storage.local.set({ pageContent: response.pageContent });
-          } else {
-            console.error('Error: ' + (response ? response.error : 'Could not retrieve page content'));
-          }
+      fadeOut(contentWrapper, () => {
+        contentWrapper.style.display = 'none';
+        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+          chrome.runtime.sendMessage({action: "getPageContent", tabId: tabs[0].id}, (response) => {
+            if (response && response.pageContent) {
+              chrome.storage.local.set({ pageContent: response.pageContent });
+            } else {
+              console.error('Error: ' + (response ? response.error : 'Could not retrieve page content'));
+            }
+          });
         });
       });
     } else {
       contentWrapper.style.display = 'block';
+      fadeIn(contentWrapper);
       chrome.storage.local.get(['highlightedText'], (result) => {
         contentElement.innerText = result.highlightedText || 'No Hext Highlighted';
       });
     }
   }
 
-  function sendToGemini(contentType) {
+  function analyzeContent(contentType) {
     btnAnalyze.disabled = true;
-    resultText.innerText = 'Analyzing...';
+    btnAnalyze.textContent = 'Analyzing...';
+    resultText.innerText = '';
+    const scoreBar = document.querySelector('.score-bar');
+    scoreBar.style.width = '0';
 
     chrome.storage.local.get(['apiKey', contentType], (result) => {
       const apiKey = result.apiKey;
@@ -86,28 +99,59 @@ document.addEventListener('DOMContentLoaded', () => {
       .then((response) => response.json())
       .then((result) => {
         btnAnalyze.disabled = false;
+        btnAnalyze.textContent = 'Analyze Text';
         const scoreText = result.candidates && result.candidates[0].content.parts[0].text.trim() || 'N/A';
         const scoreNumber = parseInt(scoreText.split('/')[0]);
+        
         resultText.innerText = scoreText;
         
         if (!isNaN(scoreNumber)) {
           if (scoreNumber >= 75) {
-            resultText.style.color = 'red';
+            resultText.style.color = 'var(--red)';
+            scoreBar.style.backgroundColor = 'var(--red)';
           } else if (scoreNumber >= 50) {
-            resultText.style.color = 'orange';
+            resultText.style.color = 'var(--yellow)';
+            scoreBar.style.backgroundColor = 'var(--yellow)';
           } else {
-            resultText.style.color = 'green';
+            resultText.style.color = 'var(--green)';
+            scoreBar.style.backgroundColor = 'var(--green)';
           }
+          scoreBar.style.width = `${scoreNumber}%`;
         } else {
-          resultText.style.color = 'black'; // Default color if score is not a number
+          resultText.style.color = 'var(--text-primary)';
+          scoreBar.style.width = '0';
         }
-        resultText.style.fontSize = '36px';
       })
       .catch((error) => {
         btnAnalyze.disabled = false;
+        btnAnalyze.textContent = 'Analyze Text';
         resultText.innerText = 'Error: ' + error.message;
         resultText.style.fontSize = '16px';
+        resultText.style.color = 'var(--red)';
       });
     });
+  }
+
+  function fadeOut(element, callback) {
+    let opacity = 1;
+    const interval = setInterval(() => {
+      if (opacity <= 0.1) {
+        clearInterval(interval);
+        callback();
+      }
+      element.style.opacity = opacity;
+      opacity -= 0.1;
+    }, 50);
+  }
+
+  function fadeIn(element) {
+    let opacity = 0;
+    const interval = setInterval(() => {
+      if (opacity >= 1) {
+        clearInterval(interval);
+      }
+      element.style.opacity = opacity;
+      opacity += 0.1;
+    }, 50);
   }
 });
